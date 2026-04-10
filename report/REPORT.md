@@ -1,8 +1,8 @@
 # Báo Cáo Lab 7: Embedding & Vector Store
 
-**Họ tên:** [Tên sinh viên]
-**Nhóm:** [Tên nhóm]
-**Ngày:** [Ngày nộp]
+**Họ tên:** Trần Quang Long
+**Nhóm:** C401-A2
+**Ngày:** 10/4/2026
 
 ---
 
@@ -11,17 +11,17 @@
 ### Cosine Similarity (Ex 1.1)
 
 **High cosine similarity nghĩa là gì?**
-> *Viết 1-2 câu:*
+High cosine similarity (gần bằng 1.0) nghĩa là hai vector có cùng hướng trong không gian đa chiều, đại diện cho việc hai đoạn văn bản có sự tương đồng lớn về mặt ngữ nghĩa, bất kể độ dài của chúng.
 
 **Ví dụ HIGH similarity:**
-- Sentence A:
-- Sentence B:
-- Tại sao tương đồng:
+- Sentence A: "Cách nấu phở bò Hà Nội truyền thống."
+- Sentence B: "Hướng dẫn làm món phở bò chuẩn vị Bắc."
+- Tại sao tương đồng: Cả hai đều tập trung vào cùng một chủ đề (phở bò) và cùng một mục đích (hướng dẫn thực hiện).
 
 **Ví dụ LOW similarity:**
-- Sentence A:
-- Sentence B:
-- Tại sao khác:
+- Sentence A: "Cách nấu phở bò Hà Nội truyền thống."
+- Sentence B: "Xin số bạn gái ngồi cạnh trên xe bus thế nào."
+- Tại sao khác: Hai câu thuộc hai lĩnh vực hoàn toàn khác nhau (ẩm thực và xã hội).
 
 **Tại sao cosine similarity được ưu tiên hơn Euclidean distance cho text embeddings?**
 > *Viết 1-2 câu:*
