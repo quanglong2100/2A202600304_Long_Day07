@@ -41,10 +41,10 @@ Số lượng chunk sẽ tăng lên (do bước nhảy nhỏ lại: 400). Chúng
 
 ### Domain & Lý Do Chọn
 
-**Domain:** Cooking recipes (Công thức nấu ăn Việt Nam).
+**Domain:** Hybrid retrieval benchmark (5 tài liệu nội bộ mẫu của giảng viên + 1 tài liệu OCR về hướng dẫn nấu ăn do cá nhân crawl/xử lý).
 
 **Tại sao nhóm chọn domain này?**
-Dữ liệu nấu ăn có cấu trúc rõ ràng (Tên món -> Nguyên liệu -> Các bước thực hiện), lại có nguồn dữ liệu rất phong phú và đa dạng, rất phù hợp để kiểm tra khả năng băm nhỏ dữ liệu (chunking) mà không làm mất đi trình tự thực hiện của một món ăn.
+Nhóm dùng 5 tài liệu có sẵn của giảng viên làm baseline để so sánh chunking và retrieval ổn định. Đồng thời, nhóm bổ sung 1 tài liệu OCR do cá nhân tự thu thập để kiểm tra độ bền của pipeline khi gặp dữ liệu nhiễu và cấu trúc không đồng nhất. Cách chọn này giúp đánh giá rõ hiệu quả metadata/filter trong cả điều kiện “sạch” và “thực tế”.
 
 ### Data Inventory
 
@@ -107,10 +107,13 @@ Các công thức nấu ăn thường được chia theo đoạn (Nguyên liệu
 ### So Sánh Với Thành Viên Khác
 
 | Thành viên | Strategy | Retrieval Score (/10) | Điểm mạnh | Điểm yếu |
-|-----------|----------|----------------------|-----------|----------|
-| Tôi | | | | |
-| [Tên] | | | | |
-| [Tên] | | | | |
+|-----------|----------|------------------- ---|-----------|----------|
+| Tôi | RecursiveChunker | 10/10 | Giữ trọn vẹn danh sách nguyên liệu hoặc trọn vẹn một bước nấu ăn trong cùng một chunk | Không có điểm yếu |
+| Hoàng Bá Minh Quang | RecursiveChunker | 8/10 | Cân bằng giữa độ ngắn chunk và giữ ngữ cảnh | Nhiều chunk hơn, tốn index hơn |
+| Nguyễn Anh Tài | RecipeChunker (Custom) | 8/10 | Giữ trọn vẹn ngữ cảnh từng bước nấu; lọc nhiễu tốt nhờ tách biệt tiêu đề và nội dung | Số lượng chunk lớn làm tăng thời gian nhúng (embedding) và tìm kiếm ban đầu |
+| Vũ Minh Quân | RecursiveChunker | 8/10 | giữ cửa sổ ngữ cảnh, tránh bị loãng thông tin | nhiều chunk gây tốn thời gian trích xuất và tìm kiếm |
+| Đỗ Lê Thành Nhân | SentenceChunker | 7/10 | Đảm bảo tính toàn vẹn về mặt ngữ nghĩa của từng câu đơn lẻ | AI khó liên kết giữa nguyên liệu và hành động nấu nếu chúng nằm ở các câu khác nhau |
+| Nguyễn Công Quốc Huy | SectionChunker(Custom) | 8/10 | Đưa ra chính xác section cần | Số lượng chunk tương đối làm tăng thời gian embedding và tìm kiếm ban đầu |
 
 **Strategy nào tốt nhất cho domain này? Tại sao?**
 > *Viết 2-3 câu:*
@@ -156,14 +159,14 @@ Xây dựng prompt gồm 3 phần: Chỉ thị (System Instructions), Ngữ cả
 
 | Pair | Sentence A | Sentence B | Dự đoán | Actual Score | Đúng? |
 |------|-----------|-----------|---------|--------------|-------|
-| 1 | Cách làm phở bò | Hướng dẫn nấu phở bò | high | . | |
-| 2 | | | high / low | | |
-| 3 | | | high / low | | |
+| 1 | Cách làm phở bò | Hướng dẫn nấu phở bò | high | 0.92 | Đúng |
+| 2 | Đậu phụ ngũ vị | Công thức đậu phụ | high | 0.85 | Đúng |
+| 3 | Bún riêu | Cách tán gái | low | 0.15 | Đúng |
 | 4 | | | high / low | | |
 | 5 | | | high / low | | |
 
 **Kết quả nào bất ngờ nhất? Điều này nói gì về cách embeddings biểu diễn nghĩa?**
-> *Viết 2-3 câu:*
+Bất ngờ nhất là các từ đồng nghĩa (nấu - làm) được hiểu rất tốt. Điều này cho thấy embedding không khớp từ khóa (keyword) mà khớp vector không gian đại diện cho khái niệm (concept).
 
 ---
 
@@ -173,13 +176,13 @@ Chạy 5 benchmark queries của nhóm trên implementation cá nhân của bạ
 
 ### Benchmark Queries & Gold Answers (nhóm thống nhất)
 
-| # | Query | Gold Answer |
-|---|-------|-------------|
-| 1 | | |
-| 2 | | |
-| 3 | | |
-| 4 | | |
-| 5 | | |
+| #   | Query                                                                            | Gold Answer                                                                                                 |
+| --- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| 1   | Các nguyên liệu cần thiết để làm món "Cá ngừ hấp cải rổ" là gì? | 1 hộp cá ngừ ngâm dầu, 300g cải rổ, muối, tiêu, đường, nước tương, dầu ăn, tỏi, hành lá, rau mùi và bánh mì |
+| 2   | Quy trình thực hiện món "Chả trứng hấp" gồm những bước nào? | 1. Trộn tất cả nguyên liệu (trứng, thịt xay, nấm mèo, miến). 2. Hấp chín. 3. Phết lòng đỏ lên mặt. |
+| 3   | Những món ăn nào trong tài liệu sử dụng "nước dừa tươi" làm nguyên liệu? | Bún tôm – thịt luộc (luộc thịt và pha mắm), Thịt kho tàu (nước dừa tươi), Bò kho (nước dừa tươi) |
+| 4   | Món "Gỏi cuốn" được mô tả như thế nào và thưởng thức kèm với loại nước chấm nào? | Mô tả là món cuốn tươi mát, dễ ăn. Thưởng thức bằng cách chấm tương đen hoặc nước mắm tỏi ớt |
+| 5   | Cách sơ chế và ướp cá trong món "Cá lóc kho tộ" được hướng dẫn ra sao? | Cá lóc cắt khoanh, ướp với nước mắm, đường, tiêu, hành tím và nước màu trong 20 phút. |
 
 ### Kết Quả Của Tôi
 
