@@ -50,7 +50,7 @@ Dữ liệu nấu ăn có cấu trúc rõ ràng (Tên món -> Nguyên liệu -> 
 
 | # | Tên tài liệu | Nguồn | Số ký tự | Metadata đã gán |
 |---|--------------|-------|----------|-----------------|
-| 1 |nau_an_formatted.txt|Sưu tầm|8500|source, extension, chunk_index|
+| 1 |nau_an_formatted.txt|Sưu tầm|187095|source, extension, chunk_index|
 | 2 |customer_support_playbook.txt|data/customer_support_playbook.txt|1692|source, extension, doc_type, department, language|
 | 3 |rag_system_design.md|data/rag_system_design.md|2391|source, extension, doc_type, department, language|
 | 4 |vector_store_notes.md|data/vector_store_notes.md|2123|source, extension, doc_type, department, language|
