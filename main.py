@@ -17,49 +17,68 @@ from src.embeddings import (
 )
 from src.models import Document
 from src.store import EmbeddingStore
+from src.chunking import RecursiveChunker
+from src.chunking import FixedSizeChunker
+from src.chunking import SentenceChunker
+from src.chunking import ChunkingStrategyComparator
 
 SAMPLE_FILES = [
-    "data/python_intro.txt",
-    "data/vector_store_notes.md",
-    "data/rag_system_design.md",
-    "data/customer_support_playbook.txt",
-    "data/chunking_experiment_report.md",
-    "data/vi_retrieval_notes.md",
+    # "data/python_intro.txt",
+    # "data/vector_store_notes.md",
+    # "data/rag_system_design.md",
+    # "data/customer_support_playbook.txt",
+    # "data/chunking_experiment_report.md",
+    # "data/vi_retrieval_notes.md",
+    "data/nau_an_formatted.txt"
 ]
 
 
 def load_documents_from_files(file_paths: list[str]) -> list[Document]:
-    """Load documents from file paths for the manual demo."""
+    """Load documents from file paths, CHUNK them, and return a list of Documents."""
     allowed_extensions = {".md", ".txt"}
     documents: list[Document] = []
+    
+    # Khởi tạo máy băm thịt (Chunker) với kích thước 500 ký tự
+    chunker = RecursiveChunker(chunk_size=500)
 
     for raw_path in file_paths:
         path = Path(raw_path)
 
         if path.suffix.lower() not in allowed_extensions:
-            print(f"Skipping unsupported file type: {path} (allowed: .md, .txt)")
+            print(f"Skipping unsupported file type: {path}")
             continue
 
         if not path.exists() or not path.is_file():
             print(f"Skipping missing file: {path}")
             continue
 
-        content = path.read_text(encoding="utf-8")
-        documents.append(
-            Document(
-                id=path.stem,
-                content=content,
-                metadata={"source": str(path), "extension": path.suffix.lower()},
+        # Đọc nguyên file
+        full_text = path.read_text(encoding="utf-8")
+        
+        # Băm nhỏ file ra thành list các strings
+        text_chunks = chunker.chunk(full_text)
+        
+        # Biến mỗi mẩu nhỏ thành một Document riêng biệt
+        for i, chunk_content in enumerate(text_chunks):
+            documents.append(
+                Document(
+                    # Tạo ID duy nhất cho từng mẩu (ví dụ: nau_an_formatted_0, nau_an_formatted_1)
+                    id=f"{path.stem}_{i}",
+                    content=chunk_content,
+                    metadata={
+                        "source": str(path), 
+                        "extension": path.suffix.lower(),
+                        "chunk_index": i
+                    },
+                )
             )
-        )
 
     return documents
 
 
 def demo_llm(prompt: str) -> str:
     """A simple mock LLM for manual RAG testing."""
-    preview = prompt[:400].replace("\n", " ")
-    return f"[DEMO LLM] Generated answer from prompt preview: {preview}..."
+    return f"\n--- FULL PROMPT SENT TO AI ---\n{prompt}\n-----------------------------"
 
 
 def run_manual_demo(question: str | None = None, sample_files: list[str] | None = None) -> int:

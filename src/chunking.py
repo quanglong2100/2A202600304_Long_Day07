@@ -189,14 +189,13 @@ class ChunkingStrategyComparator:
         sentence_res = sentence_chunker.chunk(text)
         recursive_res = recursive_chunker.chunk(text)
 
-        # Đã sửa lại tên key: fixed_size, sentence, recursive và num_chunks thành count
         return {
             "fixed_size": {
                 "count": len(fixed_res),
                 "avg_length": sum(len(c) for c in fixed_res) / len(fixed_res) if fixed_res else 0,
                 "chunks": fixed_res
             },
-            "sentence": {
+            "by_sentences": {  # <--- ĐỔI 'sentence' THÀNH 'by_sentences' Ở ĐÂY
                 "count": len(sentence_res),
                 "avg_length": sum(len(c) for c in sentence_res) / len(sentence_res) if sentence_res else 0,
                 "chunks": sentence_res

@@ -30,9 +30,6 @@ class KnowledgeBaseAgent:
         
         # 2. Build a prompt with the chunks as context
         prompt = (
-            "You are a helpful and precise assistant. Your task is to answer the user's question "
-            "based ONLY on the provided context below. If the context does not contain the answer, "
-            "simply state that you do not have enough information to answer.\n\n"
             f"Context Information:\n{context_str}\n\n"
             f"Question: {question}\n\n"
             "Answer:"
