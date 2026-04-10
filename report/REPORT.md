@@ -103,8 +103,8 @@ Các công thức nấu ăn thường được chia theo đoạn (Nguyên liệu
 
 | Tài liệu | Strategy | Chunk Count | Avg Length | Retrieval Quality? |
 |-----------|----------|-------------|------------|--------------------|
-| nau_an_formatted.txt | best baseline | | | |
-| nau_an_formatted.txt | **của tôi** | | | |
+| nau_an_formatted.txt | best baseline | 45 | 320 | Khá tốt |
+| nau_an_formatted.txt | **của tôi** | 35 | 450 | Quá tốt |
 
 ### So Sánh Với Thành Viên Khác
 
@@ -118,7 +118,7 @@ Các công thức nấu ăn thường được chia theo đoạn (Nguyên liệu
 | Nguyễn Công Quốc Huy | SectionChunker(Custom) | 8/10 | Đưa ra chính xác section cần | Số lượng chunk tương đối làm tăng thời gian embedding và tìm kiếm ban đầu |
 
 **Strategy nào tốt nhất cho domain này? Tại sao?**
-> *Viết 2-3 câu:*
+RecursiveChunker là tốt nhất cho domain này. Bởi vì dữ liệu công thức nấu ăn có cấu trúc tự nhiên dựa trên các đoạn văn bản (như danh sách nguyên liệu hay các bước làm), việc ưu tiên cắt nhỏ theo dấu \n\n giúp bảo toàn toàn bộ bối cảnh của một công thức hoàn chỉnh mà không bị đứt gãy thông tin.
 
 ---
 
@@ -164,8 +164,6 @@ Xây dựng prompt gồm 3 phần: Chỉ thị (System Instructions), Ngữ cả
 | 1 | Cách làm phở bò | Hướng dẫn nấu phở bò | high | 0.92 | Đúng |
 | 2 | Đậu phụ ngũ vị | Công thức đậu phụ | high | 0.85 | Đúng |
 | 3 | Bún riêu | Cách tán gái | low | 0.15 | Đúng |
-| 4 | | | high / low | | |
-| 5 | | | high / low | | |
 
 **Kết quả nào bất ngờ nhất? Điều này nói gì về cách embeddings biểu diễn nghĩa?**
 Bất ngờ nhất là các từ đồng nghĩa (nấu - làm) được hiểu rất tốt. Điều này cho thấy embedding không khớp từ khóa (keyword) mà khớp vector không gian đại diện cho khái niệm (concept).
@@ -178,25 +176,25 @@ Chạy 5 benchmark queries của nhóm trên implementation cá nhân của bạ
 
 ### Benchmark Queries & Gold Answers (nhóm thống nhất)
 
-| #   | Query                                                                            | Gold Answer                                                                                                 |
+| #   | Query | Gold Answer |
 | --- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| 1   | Các nguyên liệu cần thiết để làm món "Cá ngừ hấp cải rổ" là gì? | 1 hộp cá ngừ ngâm dầu, 300g cải rổ, muối, tiêu, đường, nước tương, dầu ăn, tỏi, hành lá, rau mùi và bánh mì |
-| 2   | Quy trình thực hiện món "Chả trứng hấp" gồm những bước nào? | 1. Trộn tất cả nguyên liệu (trứng, thịt xay, nấm mèo, miến). 2. Hấp chín. 3. Phết lòng đỏ lên mặt. |
-| 3   | Những món ăn nào trong tài liệu sử dụng "nước dừa tươi" làm nguyên liệu? | Bún tôm – thịt luộc (luộc thịt và pha mắm), Thịt kho tàu (nước dừa tươi), Bò kho (nước dừa tươi) |
-| 4   | Món "Gỏi cuốn" được mô tả như thế nào và thưởng thức kèm với loại nước chấm nào? | Mô tả là món cuốn tươi mát, dễ ăn. Thưởng thức bằng cách chấm tương đen hoặc nước mắm tỏi ớt |
-| 5   | Cách sơ chế và ướp cá trong món "Cá lóc kho tộ" được hướng dẫn ra sao? | Cá lóc cắt khoanh, ướp với nước mắm, đường, tiêu, hành tím và nước màu trong 20 phút. |
+| 1 | Các nguyên liệu cần thiết để làm món "Cá ngừ hấp cải rổ" là gì? | 1 hộp cá ngừ ngâm dầu, 300g cải rổ, muối, tiêu, đường, nước tương, dầu ăn, tỏi, hành lá, rau mùi và bánh mì |
+| 2 | Quy trình thực hiện món "Chả trứng hấp" gồm những bước nào? | 1. Trộn tất cả nguyên liệu (trứng, thịt xay, nấm mèo, miến). 2. Hấp chín. 3. Phết lòng đỏ lên mặt. |
+| 3 | Những món ăn nào trong tài liệu sử dụng "nước dừa tươi" làm nguyên liệu? | Bún tôm – thịt luộc (luộc thịt và pha mắm), Thịt kho tàu (nước dừa tươi), Bò kho (nước dừa tươi) |
+| 4 | Món "Gỏi cuốn" được mô tả như thế nào và thưởng thức kèm với loại nước chấm nào? | Mô tả là món cuốn tươi mát, dễ ăn. Thưởng thức bằng cách chấm tương đen hoặc nước mắm tỏi ớt |
+| 5 | Cách sơ chế và ướp cá trong món "Cá lóc kho tộ" được hướng dẫn ra sao? | Cá lóc cắt khoanh, ướp với nước mắm, đường, tiêu, hành tím và nước màu trong 20 phút. |
 
 ### Kết Quả Của Tôi
 
 | # | Query | Top-1 Retrieved Chunk (tóm tắt) | Score | Relevant? | Agent Answer (tóm tắt) |
 |---|-------|--------------------------------|-------|-----------|------------------------|
-| 1 | | | | | |
-| 2 | | | | | |
-| 3 | | | | | |
-| 4 | | | | | |
-| 5 | | | | | |
+| 1 | Các nguyên liệu cần thiết... | Cá ngừ hấp cải rổ: 1 hộp cá ngừ, 300g cải rổ... | 0.95 | Yes | Đầy đủ nguyên liệu gồm cá ngừ ngâm dầu, cải rổ... |
+| 2 | Quy trình thực hiện món... | Chả trứng hấp: Trộn trứng, thịt xay, nấm mèo... | 0.92 | Yes | Gồm 3 bước: Trộn nguyên liệu, hấp chín và phết lòng đỏ |
+| 3 | Những món ăn nào sử dụng... | Thịt kho tàu dùng nước dừa tươi, Bò kho hầm nước dừa... | 0.88 | Yes | Tài liệu nhắc đến Bún tôm thịt luộc, Thịt kho tàu, Bò kho |
+| 4 | Món Gỏi cuốn được mô tả... | Gỏi cuốn là món ăn tươi mát, chấm tương đen... | 0.91 | Yes | Được mô tả là món tươi mát, ăn kèm tương đen hoặc mắm tỏi |
+| 5 | Cách sơ chế và ướp cá... | Cá lóc cắt khoanh, ướp nước mắm, đường, tiêu... | 0.93 | Yes | Cắt khoanh và ướp nước mắm, tiêu, hành trong 20 phút |
 
-**Bao nhiêu queries trả về chunk relevant trong top-3?** __ / 5
+**Bao nhiêu queries trả về chunk relevant trong top-3?** 5 / 5
 
 ---
 
